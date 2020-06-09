@@ -9,3 +9,4 @@ this data then analised by me using random forests. But result wasn't as good as
 between them (10 pairs), skale them to distance between eyes and run logistic regresion on them. 
 Score is around 70%. Where this is confusion table [[175, 107],[ 64, 254]]. (on biometric branch)
 
+Final version is version on biometric branch.
