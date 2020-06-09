@@ -1,16 +1,8 @@
-import itertools
 import numpy as np
 import cv2
 import torch
 import os
-from torchvision.models import resnet18
-from time import time
-from sklearn import tree
-from sklearn import ensemble
 from sklearn.metrics import confusion_matrix
-import pdb
-import matplotlib.pyplot as plt
-import copy
 from sklearn.metrics import pairwise_distances
 from sklearn.linear_model import LogisticRegression
 import pickle
@@ -25,11 +17,10 @@ norm = 0.5
 
 
 def get_embed(img, model=model, lst=True):
-    '''get resNet mapping of size 1000 for each image'''
+    '''get resNet mapping of size 5 for each image'''
     if lst:
         result = model([torch.Tensor(x).permute(2, 0, 1) / 255.0 for x in img])
     else:
-
         result = model([torch.Tensor(img).permute(2, 0, 1) / 255.0])
     return [x["keypoints"][0][:5].detach().numpy()[:, :2] for x in result]
 
@@ -116,30 +107,29 @@ train_index = 90
 data_x_train, data_y_train = generate_pair_diff_sample(n2[:train_index, :], s2[:train_index, :], 0.45, norm, N_sample)
 data_x_test, data_y_test = generate_pair_diff_sample(n2[train_index:, :], s2[train_index:, :], 0.5, norm, N_sample)
 clf = LogisticRegression(random_state=0).fit(data_x_train, data_y_train)
-# clf = tree.DecisionTreeClassifier().fit(data_x_train, data_y_train)
 y_pred = clf.predict(data_x_test)
+
+# calculate result score
 skutecznosc(confusion_matrix(data_y_test, y_pred))
-
-# calculate result table
-
-actual_res = np.ones(s2.shape[0])
-actual_res[:45] = 0
-actual_res[90:95] = 0
-predicted = np.ones(s2.shape[0])
-allowed_ids = np.concatenate([np.arange(0, 45), np.arange(90, 95)])
-
-for i in range(s2.shape[0]):
-    print(clf.predict(np.abs(s2[i] - n2[i]).reshape((1, -1)) ** norm))
-
-for i in range(s2.shape[0]):
-    current = s2[i, :]
-    print(i)
-    for check_i in allowed_ids:
-        checked = n2[check_i]
-        if clf.predict(np.abs(checked - current).reshape((1, -1)) ** norm) == 0:
-            predicted[i] = 0
-            break
-
-confusion_matrix(actual_res, predicted)
 clf.score(data_x_test, data_y_test)
-#
+
+# sample of points on image
+i=5
+id = ids[i]
+
+##smile face
+img = read_image("smiling_front/"+id+"_08.jpg")
+points = s1[i][0]
+img1 = img.copy()
+
+# Radius of circle
+radius = 2
+# Blue color in BGR
+color = (255, 0, 0)
+# Line thickness of 2 px
+thickness = 2
+for x,y in points:
+    img1 = cv2.circle(img1, (x,y), radius, color, thickness)
+
+cv2.imwrite("img.png", img1)
+##
