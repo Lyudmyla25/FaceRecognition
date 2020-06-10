@@ -102,34 +102,36 @@ n2 = [normalized_dist_between_points(x[0]) for x in n1]
 n2 = np.array(n2)
 # generate set of pairs neutral + smiling
 
-train_index = 90
+train_index = 50
 
 data_x_train, data_y_train = generate_pair_diff_sample(n2[:train_index, :], s2[:train_index, :], 0.45, norm, N_sample)
 data_x_test, data_y_test = generate_pair_diff_sample(n2[train_index:, :], s2[train_index:, :], 0.5, norm, N_sample)
+
 clf = LogisticRegression(random_state=0).fit(data_x_train, data_y_train)
 y_pred = clf.predict(data_x_test)
 
 # calculate result score
+confusion_matrix(data_y_test, y_pred)
 skutecznosc(confusion_matrix(data_y_test, y_pred))
 clf.score(data_x_test, data_y_test)
 
-# sample of points on image
-i=5
-id = ids[i]
-
-##smile face
-img = read_image("smiling_front/"+id+"_08.jpg")
-points = s1[i][0]
-img1 = img.copy()
-
-# Radius of circle
-radius = 2
-# Blue color in BGR
-color = (255, 0, 0)
-# Line thickness of 2 px
-thickness = 2
-for x,y in points:
-    img1 = cv2.circle(img1, (x,y), radius, color, thickness)
-
-cv2.imwrite("img.png", img1)
-##
+# # sample of points on image
+# i=5
+# id = ids[i]
+#
+# ##smile face
+# img = read_image("smiling_front/"+id+"_08.jpg")
+# points = s1[i][0]
+# img1 = img.copy()
+#
+# # Radius of circle
+# radius = 2
+# # Blue color in BGR
+# color = (255, 0, 0)
+# # Line thickness of 2 px
+# thickness = 2
+# for x,y in points:
+#     img1 = cv2.circle(img1, (x,y), radius, color, thickness)
+#
+# cv2.imwrite("img.png", img1)
+# ##
